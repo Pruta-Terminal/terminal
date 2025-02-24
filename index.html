@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>Pruta Terminal - Next Generation DeFAI Trading</title>
+  <meta name="description" content="The next generation DeFAI trading terminal with AI-powered insights and real-time market data." />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/framer-motion/10.16.4/framer-motion.js"></script>
+  <style>
+    /* Base styles */
+    :root {
+      --primary: #00FF00;
+      --primary-dark: #00CC00;
+      --background: #000000;
+      --text: #FFFFFF;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: monospace;
+    }
+    
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Matrix Rain effect */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -10;
+      opacity: 0.4;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+    
+    .logo-icon {
+      margin-right: 0.5rem;
+    }
+    
+    .connect-button {
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+    
+    .connect-button:hover {
+      background-color: var(--primary);
+      color: black;
+    }
+    
+    /* Main content */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 0;
+    }
+    
+    .title {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-bottom: 3rem;
+    }
+    
+    /* Feature cards */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--primary);
+      padding: 1.5rem;
+      border-radius: 4px;
+    }
+    
+    .feature-icon {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feature-title {
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+    }
+    
+    .feature-desc {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    /* Waitlist form */
+    .waitlist-container {
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 2rem;
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .form-title {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    
+    input::placeholder {
+      color: rgba(0, 255, 0, 0.5);
+    }
+    
+    .submit-button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: black;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+      font-family: monospace;
+      transition: all 0.3s ease;
+    }
+    
+    .submit-button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    /* Footer */
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--primary);
+      opacity: 0.7;
+      font-size: 0.875rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .features {
+        grid-template-columns: 1fr;
+      }
+      
+      .title {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* Animation classes */
+    .typing-cursor {
+      display: inline-block;
+      width: 0.5rem;
+      height: 1.2rem;
+      background-color: var(--primary);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      from, to { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Terminal text styles */
+    .terminal-text {
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .footer-text {
+      margin-top: 2rem;
+      color: var(--primary);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">></span>_
+      </div>
+      <button class="connect-button">Connect Wallet</button>
+    </header>
+
+    <main>
+      <h1 class="title" id="main-title">Pruta Terminal</h1>
+      <p class="subtitle" id="subtitle">The next generation DeFAI trading terminal</p>
+
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">🪙</div>
+          <h3 class="feature-title">Token Rewards</h3>
+          <p class="feature-desc">Earn token airdrops by engaging with Pruta AI agents on social media. Connect your wallet and earn.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">AI Trading</h3>
+          <p class="feature-desc">Leverage the terminals agents for automated crypto trading with real-time market insights powered by kaito API.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3 class="feature-title">AI Interaction</h3>
+          <p class="feature-desc">Live voice and video chat with our AI agents, each with unique personalities and trading strategies.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏗️</div>
+          <h3 class="feature-title">Custom DeFAI</h3>
+          <p class="feature-desc">Deploy your own customized DeFAI or superintelligent trading agent with Pruta's intuitive platform.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Market Edge</h3>
+          <p class="feature-desc">Stay ahead with real-time market insights and trend analysis powered by kaito API integration.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💻</div>
+          <h3 class="feature-title">Terminal Access</h3>
+          <p class="feature-desc">Access the powerful terminal interface with advanced trading features and real-time data visualization.</p>
+        </div>
+      </div>
+
+      <div class="waitlist-container">
+        <h2 class="form-title">Join the DeFAI Revolution</h2>
+        <form id="waitlist-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="wallet">Wallet Address (Optional)</label>
+            <input type="text" id="wallet" placeholder="0x...">
+          </div>
+          <button type="submit" class="submit-button">Join Waitlist</button>
+        </form>
+      </div>
+
+      <p class="footer-text" id="footer-text">The revolution is just beginning...</p>
+    </main>
+
+    <footer>
+      © 2025 Pruta Terminal. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // Matrix Rain effect
+    document.addEventListener('DOMContentLoaded', function() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas dimensions
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      // Characters used in the matrix rain
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*";
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      
+      // Array to store the Y position of each drop
+      const drops = [];
+      for (let i = 0; i < columns; i++) {
+        drops[i] = 1;
+      }
+      
+      // Function to draw the matrix rain
+      function draw() {
+        // Set background color with transparency to create trail effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Set text color and font
+        ctx.fillStyle = "#0F0";
+        ctx.font = `${fontSize}px monospace`;
+        
+        // Loop through each drop
+        for (let i = 0; i < drops.length; i++) {
+          // Select a random character
+          const text = characters.charAt(Math.floor(Math.random() * characters.length));
+          
+          // Draw the character
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          
+          // Reset drop if it reaches the bottom or randomly
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          
+          // Move the drop down
+          drops[i]++;
+        }
+      }
+      
+      // Call the draw function at regular intervals
+      setInterval(draw, 33);
+      
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    });
+
+    // Terminal text effect for the title and subtitle
+    function typeText(elementId, text, delay = 0, speed = 50) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      setTimeout(() => {
+        element.textContent = '';
+        let i = 0;
+        
+        const typing = setInterval(() => {
+          if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+          } else {
+            clearInterval(typing);
+          }
+        }, speed);
+      }, delay);
+    }
+
+    // Apply terminal text effects
+    document.addEventListener('DOMContentLoaded', function() {
+      typeText('main-title', 'Pruta Terminal', 500, 100);
+      typeText('subtitle', 'The next generation DeFAI trading terminal', 2000, 50);
+      typeText('footer-text', 'The revolution is just beginning...', 4000, 70);
+    });
+
+    // Form submission handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('waitlist-form');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const wallet = document.getElementById('wallet').value;
+        
+        // Here you would typically send this data to your backend
+        // For this demo, we'll just show an alert
+        alert(`Thanks for joining the waitlist!\nEmail: ${email}\nWallet: ${wallet || 'Not provided'}`);
+        
+        // Reset the form
+        form.reset();
+      });
+    });
+  </script>
+</body>
+</html>
