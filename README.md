@@ -1,2 +1,2 @@
 # terminal
-Landing page for Pruta Terminal
+homepage for Pruta Terminal
